@@ -25,22 +25,32 @@
     {{end}}
 
 
-    {{if .Header}}
+    {{if .Header}}<p>The request Header:</p>
+    <ul>
         {{range $k, $v := .Header}}
+        <li>
             <p>{{$k}}</p>
             <ul>
             {{range $v}}
                 <li>{{.}}</li>
             {{end}}
             </ul>
+        </li>
         {{end}}
+    </ul>
     {{end}}
 
-    {{if .Submissions}}<p><strong>variable names</strong> (identifiers) and <em>values</em>:</p>
+    {{if .Submissions}}
+    <p>The request Form:</p>
+    <p><strong>variable names</strong> (identifiers) and <em>values</em>:</p>
+    <ul>
         {{range $key, $value := .Submissions}}
+                <li>
                 <p><strong>{{$key}}</strong></p>
                 <ul>{{range $value}}<li><em>{{.}}</em></li>{{end}}</ul>
+                </li>
         {{end}}
+    </ul>
     {{end}}
 
 </header>

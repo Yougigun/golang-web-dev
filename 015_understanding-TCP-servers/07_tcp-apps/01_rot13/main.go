@@ -39,7 +39,7 @@ func handle(conn net.Conn) {
 func rot13(bs []byte) []byte {
 	var r13 = make([]byte, len(bs))
 	for i, v := range bs {
-		// ascii 97 - 122
+		// ascii 97 - 122 (same in utf-8)
 		if v <= 109 {
 			r13[i] = v + 13
 		} else {

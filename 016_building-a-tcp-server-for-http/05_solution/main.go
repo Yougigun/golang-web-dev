@@ -37,7 +37,7 @@ func request(conn net.Conn) {
 		ln := scanner.Text()
 		fmt.Println(ln)
 		if i == 0 {
-			mux(conn, ln)
+			go mux(conn, ln)
 		}
 		if ln == "" {
 			// headers are done

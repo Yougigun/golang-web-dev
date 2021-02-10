@@ -44,7 +44,7 @@ func handle(conn net.Conn) {
 	scanner := bufio.NewScanner(conn)
 	for scanner.Scan() {
 		ln := scanner.Text()
-		fs := strings.Fields(ln)
+		fs := strings.Fields(ln) // return slice of string split by space
 		// logic
 		if len(fs) < 1 {
 			continue

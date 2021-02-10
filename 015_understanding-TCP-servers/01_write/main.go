@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"net"
+	"time"
 )
 
 func main() {
@@ -23,6 +24,7 @@ func main() {
 
 		io.WriteString(conn, "\nHello from TCP server\n")
 		fmt.Fprintln(conn, "How is your day?")
+		time.Sleep(5*time.Second)
 		fmt.Fprintf(conn, "%v", "Well, I hope!")
 
 		conn.Close()

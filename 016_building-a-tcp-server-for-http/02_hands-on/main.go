@@ -29,7 +29,7 @@ func handle(conn net.Conn) {
 	defer conn.Close()
 
 	// read request
-	request(conn)
+	go request(conn)
 
 	// write response
 	respond(conn)
@@ -43,8 +43,9 @@ func request(conn net.Conn) {
 		fmt.Println(ln)
 		if i == 0 {
 			// request line
-			m := strings.Fields(ln)[0]
-			fmt.Println("***METHOD", m)
+			fs := strings.Fields(ln)
+			fmt.Println("***METHOD", fs[0])
+			fmt.Println("***URL", fs[1])
 		}
 		if ln == "" {
 			// headers are done
