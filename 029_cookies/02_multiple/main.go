@@ -46,6 +46,7 @@ func read(w http.ResponseWriter, req *http.Request) {
 	} else {
 		fmt.Fprintln(w, "YOUR COOKIE #3:", c3)
 	}
+	log.Println(req.Cookies())
 }
 
 func abundance(w http.ResponseWriter, req *http.Request) {
