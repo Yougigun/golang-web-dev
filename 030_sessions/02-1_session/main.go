@@ -4,6 +4,8 @@ import (
 	"github.com/satori/go.uuid"
 	"html/template"
 	"net/http"
+	"golang-web-dev/030_sessions/02-1_session/session"
+
 )
 
 type user struct {
@@ -18,6 +20,11 @@ var dbSessions = map[string]string{} // session ID, user ID
 
 func init() {
 	tpl = template.Must(template.ParseGlob("templates/*"))
+	sessionManager,err := session.NewManager("memory","gosessionid", 3600)
+	if err != nil {
+		panic("Cannot New Session Manager")
+	}
+	go sessionManager.GC()
 }
 
 func main() {
