@@ -4,9 +4,9 @@ var provides = make(map[string]Provider)
 
 // Low Level Storage Structure. ex memory, file, etc. 
 type Provider interface {
-    SessionInit(sid string) (Session, error)
+    SessionInit(sid string) (Session)
     SessionRead(sid string) (Session, error)
-    SessionDestroy(sid string) error
+    SessionDestroy(sid string)
     SessionGC(maxLifeTime int64)
 }
 

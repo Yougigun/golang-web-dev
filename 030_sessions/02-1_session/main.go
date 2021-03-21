@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/satori/go.uuid"
 	"html/template"
 	"net/http"
 	"golang-web-dev/030_sessions/02-1_session/session"
+	_ "golang-web-dev/030_sessions/02-1_session/session-provider/memory"
 
 )
 
@@ -15,12 +15,14 @@ type user struct {
 }
 
 var tpl *template.Template
-var dbUsers = map[string]user{}      // user ID, user
-var dbSessions = map[string]string{} // session ID, user ID
+// var dbUsers = map[string]user{}      // user ID, user
+// var dbSessions = map[string]string{} // session ID, user ID
+var sessionManager *session.Manager
+var err error
 
 func init() {
 	tpl = template.Must(template.ParseGlob("templates/*"))
-	sessionManager,err := session.NewManager("memory","gosessionid", 3600)
+	sessionManager,err = session.NewManager("memory","gosessionid", 3600)
 	if err != nil {
 		panic("Cannot New Session Manager")
 	}
@@ -36,51 +38,41 @@ func main() {
 
 func index(w http.ResponseWriter, req *http.Request) {
 
-	// get cookie
-	c, err := req.Cookie("session")
-	if err != nil {
-		sID := uuid.NewV4()
-		c = &http.Cookie{
-			Name:  "session",
-			Value: sID.String(),
-		}
-		http.SetCookie(w, c)
-	}
-
-	// if the user exists already, get user
-	var u user
-	if un, ok := dbSessions[c.Value]; ok {
-		u = dbUsers[un]
-	}
-
 	// process form submission
+	var u user
 	if req.Method == http.MethodPost {
+		session := sessionManager.SessionStart(w,req)
+		session.Lock()
+		defer session.Unlock()
 		un := req.FormValue("username")
 		f := req.FormValue("firstname")
 		l := req.FormValue("lastname")
 		u = user{un, f, l}
-		dbSessions[c.Value] = un
-		dbUsers[un] = u
+		session.Set("username",un)
+		session.Set("firstname",f)
+		session.Set("lastname",l)
 	}
 
 	tpl.ExecuteTemplate(w, "index.gohtml", u)
 }
 
 func bar(w http.ResponseWriter, req *http.Request) {
-
+	exist := sessionManager.CookieExist(req)
 	// get cookie
-	c, err := req.Cookie("session")
-	if err != nil {
+	if !exist {
 		http.Redirect(w, req, "/", http.StatusSeeOther)
 		return
+	}else{
+		session := sessionManager.SessionStart(w,req)
+		session.RLock()
+		defer session.RUnlock()
+		un,_ := session.Get("username")
+		f,_ := session.Get("firstname")
+		l,_ := session.Get("lastname")
+		u := user{un.(string),f.(string),l.(string),}
+		tpl.ExecuteTemplate(w, "bar.gohtml", u)
 	}
-	un, ok := dbSessions[c.Value]
-	if !ok {
-		http.Redirect(w, req, "/", http.StatusSeeOther)
-		return
-	}
-	u := dbUsers[un]
-	tpl.ExecuteTemplate(w, "bar.gohtml", u)
+
 }
 
 // map examples with the comma, ok idiom
